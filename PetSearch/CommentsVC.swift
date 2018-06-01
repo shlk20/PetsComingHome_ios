@@ -10,9 +10,10 @@ import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 
-class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
+class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, UITableViewDelegate {
 
     var petId: String!
+    var publisher: String!
     var petReference: DocumentReference?  // listen realtime updates of comment table from firebase
     var commentCollection: LocalCollection<Comment>!
     
@@ -42,7 +43,7 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDelegate, UI
         let sv = self.displaySpinner(onView: self.view)
         let commentId = UUID.init().uuidString
         let date = NSDate().description
-        let username = Auth.auth().currentUser!.displayName
+        let username = UserDefaults.standard.string(forKey: "DisplayName")
         let comment = Comment(CommentId: commentId, ParentCommentId: "-1", Uid: uid, Username: username!, PetId: petId, Text: inputComment.text!, Date: date)
 
         Firestore.firestore().collection(Pet.TableName).document(petId).collection(Comment.TableName).addDocument(data: comment.dictionary) { (error) in
@@ -64,9 +65,9 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDelegate, UI
         sendButton.isEnabled = false
         tableView.tableFooterView = UIView()
         
-        tableView.delegate = self
+        tableView.dataSource = self
         tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 120
+        tableView.estimatedRowHeight = 140
         
         let query = petReference!.collection(Comment.TableName)
         commentCollection = LocalCollection(query: query) { [unowned self] (comments) in
@@ -108,7 +109,7 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDelegate, UI
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CommentTableViewCell", for: indexPath) as! CommentTableViewCell
         let comment = commentCollection[indexPath.row]
-        cell.popluate(comment: comment)
+        cell.popluate(comment: comment, publisher: self.publisher)
         return cell
     }
     
@@ -144,10 +145,11 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDelegate, UI
 
 class CommentTableViewCell: UITableViewCell {
     
+    @IBOutlet weak var superView: UIView!
     @IBOutlet weak var lblSender: UILabel!
-    @IBOutlet weak var messageBody: UITextView!
+    @IBOutlet weak var messageBody: UILabel!
     
-    func popluate(comment: Comment) {
+    func popluate(comment: Comment, publisher: String) {
         lblSender.text = comment.Username
         messageBody.text = comment.Text
     }

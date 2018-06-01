@@ -26,6 +26,7 @@ class SinglePetVC: UIViewController {
     @IBOutlet weak var txtAge: UILabel!
     @IBOutlet weak var txtChip: UILabel!
     @IBOutlet weak var txtMissing: UILabel!
+    @IBOutlet weak var txtDescription: UILabel!
     
     static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> SinglePetVC {
         let controller = storyboard.instantiateViewController(withIdentifier: "SinglePetVC") as! SinglePetVC
@@ -36,11 +37,24 @@ class SinglePetVC: UIViewController {
         super.viewDidLoad()
         
         self.title = pet?.Name
+        
+        let swipeUpRecogniser = UISwipeGestureRecognizer(target: self, action: #selector(showComments))
+        swipeUpRecogniser.direction = .up
+        self.view.addGestureRecognizer(swipeUpRecogniser)
+    }
+    
+    @objc func showComments() {
+        let controller = CommentsVC.fromStoryboard()
+        controller.petId = pet?.PetId
+        controller.publisher = pet?.Uid
+        controller.petReference = self.petReference
+        present(controller, animated: true, completion: nil)
     }
     
     @IBAction func didTapComment(_ sender: Any) {
         let controller = CommentsVC.fromStoryboard()
         controller.petId = pet?.PetId
+        controller.publisher = pet?.Uid
         controller.petReference = self.petReference
         present(controller, animated: true, completion: nil)
     }
@@ -81,5 +95,6 @@ class SinglePetVC: UIViewController {
         txtChip.sizeToFit()
         txtMissing.text = pet.MissingSince
         txtMissing.sizeToFit()
+        txtDescription.text = pet.Description
     }
 }
