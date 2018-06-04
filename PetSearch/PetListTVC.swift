@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
+import GoogleSignIn
 
 class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource {
     
@@ -32,14 +33,22 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     
     @IBAction func didTapSignButton(_ sender: Any) {
         if isSignin {
-            // log out
+            // sign out
             do {
                 try Auth.auth().signOut()
+                if UserDefaults.standard.integer(forKey: "SigninType") == 2 {
+                    print("Google sign out")
+                    GIDSignIn.sharedInstance().disconnect()
+                    GIDSignIn.sharedInstance().signOut()
+                }
+                UserDefaults.standard.removeObject(forKey: "DisplayName")
+                UserDefaults.standard.removeObject(forKey: "SigninType")
                 isSignin = false
             } catch let signOutError as NSError {
                 alertMessage(in: self, title: "", message: "Error signing out: \(signOutError)")
             }
         } else {
+            // sign in
             performSegue(withIdentifier: "showLoginView", sender: sender)
         }
     }
@@ -114,6 +123,14 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                 self.performSegue(withIdentifier: "showLoginView", sender: sender)
             }
         }
+    }
+    
+    @IBAction func didTapShowMapButton(_ sender: Any) {
+        let controller = MapVC.fromStoryboard()
+        controller.title = "Poor little things around you"
+        controller.documents = self.documents // sending data to the mapVC
+        controller.mapMode = .petAroundYou
+        self.navigationController?.pushViewController(controller, animated: true)
     }
     
     @IBAction func toggleSideMenu(_ sender: Any) {

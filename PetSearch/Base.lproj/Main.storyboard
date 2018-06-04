@@ -16,7 +16,7 @@
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController storyboardIdentifier="LogInVC" useStoryboardIdentifierAsRestorationIdentifier="YES" id="BYZ-38-t0r" customClass="LogInVC" customModule="PetSearch" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="lo">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -859,6 +859,9 @@
                                                             <integer key="value" value="20"/>
                                                         </userDefinedRuntimeAttribute>
                                                     </userDefinedRuntimeAttributes>
+                                                    <connections>
+                                                        <action selector="didTapShowMapButton:" destination="arG-Jr-9NX" eventType="touchUpInside" id="snv-6O-Trs"/>
+                                                    </connections>
                                                 </button>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="avatar" translatesAutoresizingMaskIntoConstraints="NO" id="rtI-a6-g5f">
                                                     <rect key="frame" x="8" y="8" width="40" height="40"/>
@@ -948,7 +951,7 @@
         <!--MapVC-->
         <scene sceneID="3Gj-S2-T2W">
             <objects>
-                <viewController id="rBg-ph-Pwg" customClass="MapVC" customModule="PetSearch" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MapVC" id="rBg-ph-Pwg" customClass="MapVC" customModule="PetSearch" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="VQ7-Dq-XE8">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -1112,6 +1115,9 @@
                                         <state key="normal" title="Choose on map latest pet location">
                                             <color key="titleColor" red="0.17797914619999999" green="1" blue="0.17748012320000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
+                                        <connections>
+                                            <action selector="didTapSelectLocation:" destination="U9Q-lR-Eh9" eventType="touchUpInside" id="Wmi-Xm-REU"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <constraints>
@@ -1201,7 +1207,7 @@
         <!--RegisterVC-->
         <scene sceneID="5EJ-qt-E8G">
             <objects>
-                <viewController id="W7p-zl-dn7" customClass="RegisterVC" customModule="PetSearch" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="RegisterVC" id="W7p-zl-dn7" customClass="RegisterVC" customModule="PetSearch" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="eqa-hD-p61">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

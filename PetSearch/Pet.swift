@@ -25,8 +25,8 @@ struct Pet {
     var Status: String
     var MissingSince: String
     var Description: String
-    var LastX: Float32
-    var LastY: Float32
+    var LastX: Double
+    var LastY: Double
     var Region: String
     
     var dictionary: [String: Any] {
@@ -80,8 +80,8 @@ extension Pet: DocumentSerializable {
                   Status: dictionary["Status"] as? String ?? "",
                   MissingSince: dictionary["MissingSince"] as? String ?? "",
                   Description: dictionary["Description"] as? String ?? "",
-                  LastX: dictionary["LastX"] as? Float32 ?? 0.00,
-                  LastY: dictionary["LastY"] as? Float32 ?? 0.00,
+                  LastX: dictionary["LastX"] as? Double ?? 0.00,
+                  LastY: dictionary["LastY"] as? Double ?? 0.00,
                   Region: dictionary["Region"] as? String ?? "")
     }
 }

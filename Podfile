@@ -9,6 +9,8 @@ target 'PetSearch' do
   pod 'Firebase/Auth'
   pod 'Firebase/Storage'
   pod 'Firebase/Firestore'
+  pod 'GoogleMaps'
+  pod 'GoogleSignIn'
   # Pods for PetSearch
 
   target 'PetSearchTests' do

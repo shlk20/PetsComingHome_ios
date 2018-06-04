@@ -51,6 +51,8 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, 
             if let error = error {
                 alertMessage(in: self, title: "", message: "Add comment failed. \(error.localizedDescription)")
             } else {
+                self.inputComment.text = ""
+                self.inputComment.resignFirstResponder()
                 alertMessage(in: self, title: "", message: "Add comment successfull")
             }
         }
@@ -69,7 +71,7 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, 
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 140
         
-        let query = petReference!.collection(Comment.TableName)
+        let query = petReference!.collection(Comment.TableName).order(by: "Date")
         commentCollection = LocalCollection(query: query) { [unowned self] (comments) in
             if self.commentCollection.count == 0 {
                 return

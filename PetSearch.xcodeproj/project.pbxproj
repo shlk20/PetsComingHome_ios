@@ -30,6 +30,8 @@
 		B65FA87820BF68290071D9CC /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65FA87720BF68290071D9CC /* User.swift */; };
 		B65FA87A20BF69BD0071D9CC /* UserPet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65FA87920BF69BD0071D9CC /* UserPet.swift */; };
 		B65FA87C20BF6AFD0071D9CC /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65FA87B20BF6AFD0071D9CC /* Comment.swift */; };
+		B6633C0B20C245B200568009 /* GoogleMapInfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B6633C0A20C245B200568009 /* GoogleMapInfoWindow.xib */; };
+		B6633C0D20C24A0200568009 /* GoogleMapInfoWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */; };
 		B6BD8B8520A7D44E00AEE7A3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */; };
 		B6C3386A20C0127F008A850B /* CommentsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C3386920C0127F008A850B /* CommentsVC.swift */; };
 		C437745295660A601B4FFCD8 /* Pods_PetSearchUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048EBEB60C9600F06B2888B0 /* Pods_PetSearchUITests.framework */; };
@@ -89,6 +91,8 @@
 		B65FA87720BF68290071D9CC /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B65FA87920BF69BD0071D9CC /* UserPet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserPet.swift; sourceTree = "<group>"; };
 		B65FA87B20BF6AFD0071D9CC /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
+		B6633C0A20C245B200568009 /* GoogleMapInfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GoogleMapInfoWindow.xib; sourceTree = "<group>"; };
+		B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapInfoWindow.swift; sourceTree = "<group>"; };
 		B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B6C3386920C0127F008A850B /* CommentsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsVC.swift; sourceTree = "<group>"; };
 		BCC7E2D6A0FD6438E2C15E02 /* Pods-PetSearchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PetSearchUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PetSearchUITests/Pods-PetSearchUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -191,6 +195,7 @@
 				90AAD5CA20A2C7A50086556F /* Assets.xcassets */,
 				90AAD5C720A2C7A50086556F /* Main.storyboard */,
 				90AAD5CC20A2C7A50086556F /* LaunchScreen.storyboard */,
+				B6633C0A20C245B200568009 /* GoogleMapInfoWindow.xib */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -220,6 +225,7 @@
 				90AAD60520A2C9720086556F /* MapVC.swift */,
 				90AAD60720A2C9930086556F /* PetListTVC.swift */,
 				B6C3386920C0127F008A850B /* CommentsVC.swift */,
+				B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -268,6 +274,7 @@
 				90AAD5BD20A2C7A50086556F /* Frameworks */,
 				90AAD5BE20A2C7A50086556F /* Resources */,
 				A41E1439BF4ECDBDAE200814 /* [CP] Embed Pods Frameworks */,
+				CEF2D84178B18752C308F702 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -368,6 +375,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				90AAD5CE20A2C7A50086556F /* LaunchScreen.storyboard in Resources */,
+				B6633C0B20C245B200568009 /* GoogleMapInfoWindow.xib in Resources */,
 				B6BD8B8520A7D44E00AEE7A3 /* GoogleService-Info.plist in Resources */,
 				90AAD5CB20A2C7A50086556F /* Assets.xcassets in Resources */,
 				90AAD5C920A2C7A50086556F /* Main.storyboard in Resources */,
@@ -399,6 +407,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-PetSearch/Pods-PetSearch-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
@@ -412,6 +421,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
@@ -463,6 +473,26 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		CEF2D84178B18752C308F702 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-PetSearch/Pods-PetSearch-resources.sh",
+				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-PetSearch/Pods-PetSearch-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		D2033B49E878E59CB250BF28 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -491,6 +521,7 @@
 				B65FA87420BF5FE80071D9CC /* Pet.swift in Sources */,
 				90AAD60020A2C9260086556F /* FilterVC.swift in Sources */,
 				B60EA07720A7FE36008BF10D /* Helper.swift in Sources */,
+				B6633C0D20C24A0200568009 /* GoogleMapInfoWindow.swift in Sources */,
 				90AAD5C620A2C7A50086556F /* ViewController.swift in Sources */,
 				90AAD60220A2C93C0086556F /* SinglePetVC.swift in Sources */,
 				90AAD60420A2C9610086556F /* AddPetVC.swift in Sources */,
