@@ -102,8 +102,16 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let gender = txtGender?.text ?? ""
         let desexed = txtDesexed?.text ?? ""
         let size = txtSize?.text ?? ""
-        let since = UInt64(0)//Date(timeIntervalSince1970: (txtSince?.text / 1000.0))
         let status = txtStatus?.text ?? ""
+        
+        var sinceTimestamp = UInt64(0)
+        if let since = txtSince?.text {
+            print(since)
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd'/'MM'/'yyyy"
+            sinceTimestamp = UInt64(dateFormatter.date(from: since)!.timestamp)
+        }
+        
             
         var imageData = Data()
         imageData = UIImageJPEGRepresentation(image, 0.1)! as Data  //compress the image and makes it to be the Data type
@@ -117,7 +125,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
                 return
             }
             if metadata.size > 0 {
-                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: Int(age)!, MicrochipNumber: mcNumber, Photo: "images/" + imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: since, Description: "", Latitude: self.location!.0.coordinate.latitude, Longitude: self.location!.0.coordinate.longitude, Region: self.location!.1)
+                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: Int(age)!, MicrochipNumber: mcNumber, Photo: "images/" + imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: sinceTimestamp, Description: "", Latitude: self.location!.0.coordinate.latitude, Longitude: self.location!.0.coordinate.longitude, Region: self.location!.1)
                 
                 Firestore.firestore().collection(Pet.TableName).document(petId).setData(pet.dictionary, completion: { (error) in
                     self.removeSpinner(spinner: sv)
