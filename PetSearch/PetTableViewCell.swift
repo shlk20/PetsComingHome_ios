@@ -20,7 +20,7 @@ class PetTableViewCell: UITableViewCell {
     @IBOutlet weak var lblLocation: UILabel!
     
     func popluate(pet: Pet) {
-        let imageRef = Storage.storage().reference().child("images").child(pet.Photo)
+        let imageRef = Storage.storage().reference().child(pet.Photo)
         imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
             guard let data = data else {
                 return

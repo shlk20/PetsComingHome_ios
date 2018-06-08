@@ -92,6 +92,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                 if let model = Pet(dictionary: document.data()) {
                     return model
                 } else {
+                    print("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
                     fatalError("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
                 }
             }

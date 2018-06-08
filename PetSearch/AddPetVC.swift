@@ -10,7 +10,7 @@ import UIKit
 import Firebase
 import GoogleMaps
 
-class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     let locationManager = CLLocationManager()
     
@@ -24,12 +24,36 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     @IBOutlet weak var txtColor: UITextField!
     @IBOutlet weak var txtAge: UITextField!
     @IBOutlet weak var txtMcNumber: UITextField!
-    @IBOutlet weak var txtSize: UITextField?
-    @IBOutlet weak var txtKind: UITextField?
-    @IBOutlet weak var txtGender: UITextField?
-    @IBOutlet weak var txtDesexed: UITextField?
-    @IBOutlet weak var txtStatus: UITextField?
-    @IBOutlet weak var txtSince: UITextField?
+    @IBOutlet weak var txtSize: RemoveCursor! {
+        didSet {
+            txtSize.inputView = sizePickerView
+        }
+    }
+    @IBOutlet weak var txtKind: RemoveCursor! {
+        didSet {
+            txtKind.inputView = kindPickerView
+        }
+    }
+    @IBOutlet weak var txtGender: RemoveCursor! {
+        didSet {
+            txtGender.inputView = genderPickerView
+        }
+    }
+    @IBOutlet weak var txtDesexed: RemoveCursor! {
+        didSet {
+            txtDesexed.inputView = desexedPickerView
+        }
+    }
+    @IBOutlet weak var txtStatus: RemoveCursor! {
+        didSet {
+            txtStatus.inputView = statusPickerView
+        }
+    }
+    @IBOutlet weak var txtSince: RemoveCursor! {
+        didSet {
+            txtSince.inputView = missingDatePickerView
+        }
+    }
     var location: (CLLocation, String)?
     
     @IBAction func goToLibrary(_ sender: UIButton) {
@@ -78,7 +102,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let gender = txtGender?.text ?? ""
         let desexed = txtDesexed?.text ?? ""
         let size = txtSize?.text ?? ""
-        let since = txtSince?.text ?? ""
+        let since = UInt64(0)//Date(timeIntervalSince1970: (txtSince?.text / 1000.0))
         let status = txtStatus?.text ?? ""
             
         var imageData = Data()
@@ -93,7 +117,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
                 return
             }
             if metadata.size > 0 {
-                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: age, MicrochipNumber: mcNumber, Photo: imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: since, Description: "", LastX: self.location!.0.coordinate.latitude, LastY: self.location!.0.coordinate.longitude, Region: self.location!.1)
+                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: Int(age)!, MicrochipNumber: mcNumber, Photo: "images/" + imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: since, Description: "", Latitude: self.location!.0.coordinate.latitude, Longitude: self.location!.0.coordinate.longitude, Region: self.location!.1)
                 
                 Firestore.firestore().collection(Pet.TableName).document(petId).setData(pet.dictionary, completion: { (error) in
                     self.removeSpinner(spinner: sv)
@@ -161,7 +185,112 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     override func viewWillDisappear(_ animated: Bool) {
         Auth.auth().removeStateDidChangeListener(handle!)
     }
-
+    
+    private lazy var sizePickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        return pickerView
+    }()
+    
+    private lazy var kindPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        return pickerView
+    }()
+    
+    private lazy var genderPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        return pickerView
+    }()
+    
+    private lazy var desexedPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        return pickerView
+    }()
+    
+    private lazy var statusPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
+        pickerView.dataSource = self
+        pickerView.delegate = self
+        return pickerView
+    }()
+    
+    private lazy var missingDatePickerView: UIDatePicker = {
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = UIDatePickerMode.date
+        datePicker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
+        return datePicker
+    }()
+    
+    @objc private func dateChanged(_ sender: UIDatePicker) {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: sender.date)
+        if let day = components.day?.description, let month = components.month?.description, let year = components.year?.description {
+            txtSince.text = day + "/" + month + "/" + year
+        }
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        switch pickerView {
+        case sizePickerView:
+            return Pet.sizes.count
+        case kindPickerView:
+            return Pet.kinds.count
+        case genderPickerView:
+            return Pet.genders.count
+        case desexedPickerView:
+            return Pet.desexeds.count
+        case statusPickerView:
+            return Pet.status.count
+        case _:
+            fatalError("Unhandled picker view: \(pickerView)")
+        }
+    }
+    
+    // MARK: - UIPickerViewDelegate
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent: Int) -> String? {
+        switch pickerView {
+        case sizePickerView:
+            return Pet.sizes[row]
+        case kindPickerView:
+            return Pet.kinds[row]
+        case genderPickerView:
+            return Pet.genders[row]
+        case desexedPickerView:
+            return Pet.desexeds[row]
+        case statusPickerView:
+            return Pet.status[row]
+        case _:
+            fatalError("Unhandled picker view: \(pickerView)")
+        }
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        switch pickerView {
+        case sizePickerView:
+            txtSize.text = Pet.sizes[row]
+        case kindPickerView:
+            txtKind.text = Pet.kinds[row]
+        case genderPickerView:
+            txtGender.text = Pet.genders[row]
+        case desexedPickerView:
+            txtDesexed.text = Pet.desexeds[row]
+        case statusPickerView:
+            txtStatus.text = Pet.status[row]
+        case _:
+            fatalError("Unhandled picker view: \(pickerView)")
+        }
+    }
 }
 
 extension AddPetVC: CLLocationManagerDelegate {

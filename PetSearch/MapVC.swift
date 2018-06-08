@@ -98,7 +98,7 @@ class MapVC: UIViewController, GMSMapViewDelegate {
             
             let infoWindow = Bundle.main.loadNibNamed("GoogleMapInfoWindow", owner: self, options: nil)?.first as! GoogleMapInfoWindow
             
-            let imageRef = Storage.storage().reference().child("images").child(pet.Photo)
+            let imageRef = Storage.storage().reference().child(pet.Photo)
             imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
                 guard let data = data else {
                     return
@@ -132,7 +132,7 @@ extension MapVC: CLLocationManagerDelegate {
         if mapMode == .petAroundYou { // if the map's mode is pet around you, then show markers of pets
             for document in documents {
                 if let model = Pet(dictionary: document.data()!) {
-                    let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: model.LastX, longitude: model.LastY))
+                    let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: model.Latitude, longitude: model.Longitude))
                     marker.userData = document
                     marker.map = mapView
                     marker.tracksInfoWindowChanges = true

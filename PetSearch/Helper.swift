@@ -29,3 +29,13 @@ func confirmMessage(in inView: UIViewController, message alert: String, confirmT
     confirmationController.popoverPresentationController?.sourceRect = .init(x: inView.view.frame.size.width / 2, y: inView.view.frame.size.height, width: 0, height: 0)
     inView.present(confirmationController, animated: true) {}
 }
+
+extension Date {
+    var timestamp: UInt64 {
+        return UInt64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
+    
+    init(timestamp: UInt64) {
+        self = Date(timeIntervalSince1970: TimeInterval(timestamp / 1000))
+    }
+}

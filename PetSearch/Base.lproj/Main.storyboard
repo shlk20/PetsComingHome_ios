@@ -999,14 +999,14 @@
                                             <action selector="didAddPet:" destination="U9Q-lR-Eh9" eventType="touchUpInside" id="x2g-dz-nsY"/>
                                         </connections>
                                     </button>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Size" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="yxC-mp-cHQ">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Size" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="yxC-mp-cHQ" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="225" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Missing since or was found on" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MIf-21-ZPn">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Missing since or was found on" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MIf-21-ZPn" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="415" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
@@ -1036,21 +1036,21 @@
                                         <color key="textColor" red="0.17254901959999999" green="0.80784313730000001" blue="0.63529411759999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Status" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="0Pa-7G-NYs">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Status" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="0Pa-7G-NYs" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="377" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Desexed" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="LdX-Ps-TGl">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Desexed" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="LdX-Ps-TGl" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="339" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Kind" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="E1T-Qm-vAy">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Kind" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="E1T-Qm-vAy" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="263" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
@@ -1076,7 +1076,7 @@
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" name="Futura-Medium" family="Futura" pointSize="17"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LIk-nq-Lk3">
                                         <rect key="frame" x="0.0" y="453" width="375" height="29"/>
@@ -1092,7 +1092,7 @@
                                             <action selector="goToLibrary:" destination="U9Q-lR-Eh9" eventType="touchUpInside" id="S5P-6a-DHe"/>
                                         </connections>
                                     </button>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Gender" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hnJ-wA-4bZ">
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Gender" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hnJ-wA-4bZ" customClass="RemoveCursor" customModule="PetSearch" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="301" width="375" height="30"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="1" alpha="0.041336686640000002" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="textColor"/>

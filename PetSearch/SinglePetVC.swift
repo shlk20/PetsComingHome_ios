@@ -64,7 +64,7 @@ class SinglePetVC: UIViewController {
         
         guard let pet = pet else { return }
         
-        let imageRef = Storage.storage().reference().child("images").child(pet.Photo)
+        let imageRef = Storage.storage().reference().child(pet.Photo)
         imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
             guard let data = data else {
                 return
@@ -89,11 +89,11 @@ class SinglePetVC: UIViewController {
         txtGender.sizeToFit()
         txtDesexed.text = pet.Desexed
         txtDesexed.sizeToFit()
-        txtAge.text = pet.Age
+        txtAge.text = pet.Age.description
         txtAge.sizeToFit()
         txtChip.text = pet.MicrochipNumber
         txtChip.sizeToFit()
-        txtMissing.text = pet.MissingSince
+        txtMissing.text = Date(timestamp: pet.MissingSince).description
         txtMissing.sizeToFit()
         txtDescription.text = pet.Description
     }
