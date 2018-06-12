@@ -11,12 +11,12 @@ import GoogleMaps
 import Firebase
 
 enum MapMode {
-    case chooseLocation, petAroundYou
+    case chooseLocation, petAroundYou, filterLocation
 }
 
 class MapVC: UIViewController, GMSMapViewDelegate {
     
-    let locationManager = CLLocationManager()
+    private let locationManager = CLLocationManager()
     var documents: [DocumentSnapshot] = []
     var mapMode = MapMode.chooseLocation
     var mapView: GMSMapView!
@@ -37,6 +37,8 @@ class MapVC: UIViewController, GMSMapViewDelegate {
             self.zoomLevel = 15.0
         case .petAroundYou:
             self.zoomLevel = 13.0
+        case .filterLocation:
+            self.zoomLevel = 15.0
         }
         
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -69,7 +71,27 @@ class MapVC: UIViewController, GMSMapViewDelegate {
                     marker.map = mapView
                     confirmMessage(in: self, message: "Would you like to use this coordinate?", confirmText: "OK", confirmMethod: { (action) in
                         let delegateController = self.delegateController as! AddPetVC
-                        delegateController.location = (CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude), address.subLocality! + ", " + address.locality!)
+                        let subLocality = address.subLocality ?? (address.locality ?? "")
+                        let locality = address.locality ?? ""
+                        delegateController.location = (CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude), subLocality + ", " + locality)
+                        delegateController.btnMap.setTitle(subLocality + ", " + locality, for: .normal)
+                        self.navigationController?.popViewController(animated: true)
+                    }, cancel: nil)
+                }
+            }
+        } else if mapMode == .filterLocation {
+            mapView.clear()
+            let marker = GMSMarker(position: coordinate)
+            GMSGeocoder().reverseGeocodeCoordinate(coordinate) { (result, error) in
+                if let address = result?.firstResult() {
+                    marker.map = mapView
+                    confirmMessage(in: self, message: "Would you like to use this coordinate?", confirmText: "OK", confirmMethod: { (action) in
+                        let delegateController = self.delegateController as! FilterVC
+                        delegateController.latitude = coordinate.latitude
+                        delegateController.longitude = coordinate.longitude
+                        let subLocality = address.subLocality ?? (address.locality ?? "")
+                        let locality = address.locality ?? ""
+                        delegateController.btnMap.setTitle(subLocality + ", " + locality, for: .normal)
                         self.navigationController?.popViewController(animated: true)
                     }, cancel: nil)
                 }

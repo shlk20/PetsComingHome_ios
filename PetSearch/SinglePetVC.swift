@@ -28,6 +28,8 @@ class SinglePetVC: UIViewController {
     @IBOutlet weak var txtMissing: UILabel!
     @IBOutlet weak var txtDescription: UILabel!
     
+    let imageCache = NSCache<AnyObject, UIImage>()
+    
     static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> SinglePetVC {
         let controller = storyboard.instantiateViewController(withIdentifier: "SinglePetVC") as! SinglePetVC
         return controller
@@ -51,26 +53,34 @@ class SinglePetVC: UIViewController {
         present(controller, animated: true, completion: nil)
     }
     
-    @IBAction func didTapComment(_ sender: Any) {
-        let controller = CommentsVC.fromStoryboard()
-        controller.petId = pet?.PetId
-        controller.publisher = pet?.Uid
-        controller.petReference = self.petReference
-        present(controller, animated: true, completion: nil)
-    }
+//    @IBAction func didTapComment(_ sender: Any) {
+//        let controller = CommentsVC.fromStoryboard()
+//        controller.petId = pet?.PetId
+//        controller.publisher = pet?.Uid
+//        controller.petReference = self.petReference
+//        present(controller, animated: true, completion: nil)
+//    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         guard let pet = pet else { return }
         
-        let imageRef = Storage.storage().reference().child(pet.Photo)
-        imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-            guard let data = data else {
-                return
-            }
-            let image = UIImage(data: data)
-            self.petImage.image = image
+        if let imageFromCache = imageCache.object(forKey: pet.Photo as AnyObject) {
+            print("cache")
+            self.petImage.image = imageFromCache
+        } else {
+//            print("load")
+//            let imageRef = Storage.storage().reference().child(pet.Photo)
+//            imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+//                guard let data = data else {
+//                    return
+//                }
+//                let image = UIImage(data: data)
+//                //self.petImage.setToCircle()
+//                self.imageCache.setObject(image!, forKey: pet.Photo as AnyObject)
+//                self.petImage.image = image
+//            }
         }
         
         txtKind.text = pet.Kind

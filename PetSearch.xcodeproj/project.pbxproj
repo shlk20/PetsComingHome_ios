@@ -34,6 +34,9 @@
 		B6633C0D20C24A0200568009 /* GoogleMapInfoWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */; };
 		B6BD8B8520A7D44E00AEE7A3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */; };
 		B6C3386A20C0127F008A850B /* CommentsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C3386920C0127F008A850B /* CommentsVC.swift */; };
+		B6FDE9C420CE291700439E9E /* StylesB.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C220CE291700439E9E /* StylesB.swift */; };
+		B6FDE9C520CE291700439E9E /* StylesNC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C320CE291700439E9E /* StylesNC.swift */; };
+		B6FDE9C720CE292300439E9E /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C620CE292300439E9E /* SettingsVC.swift */; };
 		C437745295660A601B4FFCD8 /* Pods_PetSearchUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048EBEB60C9600F06B2888B0 /* Pods_PetSearchUITests.framework */; };
 		E9E05B7FE7646C3487533186 /* Pods_PetSearchTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 87E5B5FF4AAB3831A90192B4 /* Pods_PetSearchTests.framework */; };
 /* End PBXBuildFile section */
@@ -95,6 +98,9 @@
 		B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapInfoWindow.swift; sourceTree = "<group>"; };
 		B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B6C3386920C0127F008A850B /* CommentsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsVC.swift; sourceTree = "<group>"; };
+		B6FDE9C220CE291700439E9E /* StylesB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StylesB.swift; sourceTree = "<group>"; };
+		B6FDE9C320CE291700439E9E /* StylesNC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StylesNC.swift; sourceTree = "<group>"; };
+		B6FDE9C620CE292300439E9E /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
 		BCC7E2D6A0FD6438E2C15E02 /* Pods-PetSearchUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PetSearchUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PetSearchUITests/Pods-PetSearchUITests.release.xcconfig"; sourceTree = "<group>"; };
 		CA967F1FE69FC27FB7F41CC6 /* Pods-PetSearchUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PetSearchUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PetSearchUITests/Pods-PetSearchUITests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -192,6 +198,8 @@
 		90AAD5F520A2C8290086556F /* View */ = {
 			isa = PBXGroup;
 			children = (
+				B6FDE9C220CE291700439E9E /* StylesB.swift */,
+				B6FDE9C320CE291700439E9E /* StylesNC.swift */,
 				90AAD5CA20A2C7A50086556F /* Assets.xcassets */,
 				90AAD5C720A2C7A50086556F /* Main.storyboard */,
 				90AAD5CC20A2C7A50086556F /* LaunchScreen.storyboard */,
@@ -215,6 +223,7 @@
 		90AAD5FB20A2C8680086556F /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				B6FDE9C620CE292300439E9E /* SettingsVC.swift */,
 				B6135BA820B663DC008FC4E6 /* PetTableViewCell.swift */,
 				90AAD5F120A2C7F80086556F /* LogInVC.swift */,
 				90AAD5C520A2C7A50086556F /* ViewController.swift */,
@@ -523,10 +532,13 @@
 				B60EA07720A7FE36008BF10D /* Helper.swift in Sources */,
 				B6633C0D20C24A0200568009 /* GoogleMapInfoWindow.swift in Sources */,
 				90AAD5C620A2C7A50086556F /* ViewController.swift in Sources */,
+				B6FDE9C520CE291700439E9E /* StylesNC.swift in Sources */,
 				90AAD60220A2C93C0086556F /* SinglePetVC.swift in Sources */,
+				B6FDE9C420CE291700439E9E /* StylesB.swift in Sources */,
 				90AAD60420A2C9610086556F /* AddPetVC.swift in Sources */,
 				90AAD5FE20A2C8F10086556F /* RegisterVC.swift in Sources */,
 				B65FA87820BF68290071D9CC /* User.swift in Sources */,
+				B6FDE9C720CE292300439E9E /* SettingsVC.swift in Sources */,
 				B6C3386A20C0127F008A850B /* CommentsVC.swift in Sources */,
 				B65FA87620BF66F00071D9CC /* LocalCollection.swift in Sources */,
 				90AAD60620A2C9720086556F /* MapVC.swift in Sources */,

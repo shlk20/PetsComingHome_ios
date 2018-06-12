@@ -10,17 +10,39 @@ import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 import GoogleSignIn
+import CoreLocation
+import UserNotifications
 
 class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource {
     
     private var handle: AuthStateDidChangeListenerHandle?
+    private var sideMenuSwipeGestureRecogniser: UISwipeGestureRecognizer!
     
     @IBOutlet var petListView: UITableView!
     @IBOutlet var filterStatusView: UIStackView!
     @IBOutlet var filterBarHeight: NSLayoutConstraint!
-    @IBOutlet weak var sideMenuConstraint: NSLayoutConstraint!
     @IBOutlet weak var blurView: UIVisualEffectView!
     @IBOutlet weak var btnLoginOrLogout: UIButton!
+    private let locationManager = CLLocationManager()
+    var restrictByLatMin: Double = 0.0
+    var restrictByLatMax: Double = 0.0
+    var restrictByLonMin: Double = 0.0
+    var restrictByLonMax: Double = 0.0
+    
+    var ownPetsList = false {
+        didSet {
+            if ownPetsList, let uid = UserDefaults.standard.string(forKey: "UserId") {
+                print("Own Pets List")
+                var baseQuery = self.baseQuery()
+                baseQuery = baseQuery.whereField("Uid", isEqualTo: uid)
+                self.query = baseQuery
+            } else {
+                self.query = baseQuery()
+            }
+            observeQuery()
+        }
+    }
+    
     private var isSignin = false {
         didSet {
             if isSignin {
@@ -37,10 +59,10 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             do {
                 try Auth.auth().signOut()
                 if UserDefaults.standard.integer(forKey: "SigninType") == 2 {
-                    print("Google sign out")
                     GIDSignIn.sharedInstance().disconnect()
                     GIDSignIn.sharedInstance().signOut()
                 }
+                UserDefaults.standard.removeObject(forKey: "UserId")
                 UserDefaults.standard.removeObject(forKey: "DisplayName")
                 UserDefaults.standard.removeObject(forKey: "SigninType")
                 isSignin = false
@@ -53,17 +75,49 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         }
     }
     
-    @IBOutlet weak var sideMenu: UIView!
-    private var sideMenuStatus = false { // false means the side menu is hidden
-        didSet {
-            if sideMenuStatus {
-                sideMenuConstraint.constant = 0
-            } else {
-                sideMenuConstraint.constant = -200
+    @IBAction func didTapSettings(_ sender: Any) {
+        performSegue(withIdentifier: "showSettings", sender: sender)
+    }
+    
+    @IBAction func didTapPetsList(_ sender: Any) {
+        ownPetsList = false
+        sideMenuStatus = false
+    }
+    
+    @IBAction func didTapMyPets(_ sender: Any) {
+        if isSignin {
+            ownPetsList = true
+            sideMenuStatus = false
+        } else {
+            alertMessage(in: self, title: "", message: "Please sign in first") { (action) in
+                self.performSegue(withIdentifier: "showLoginView", sender: sender)
             }
         }
     }
     
+    @IBOutlet weak var sideMenu: UIView!
+    private var sideMenuStatus = false { // false means the side menu is hidden
+        didSet {
+            if sideMenuStatus {
+                self.view.addGestureRecognizer(sideMenuSwipeGestureRecogniser)
+                UIView.animate(withDuration: 0.5) {
+                    //self.sideMenuConstraint.constant += 100
+                    self.sideMenu.center.x += self.sideMenu.bounds.width
+                }
+                print(self.sideMenu.center.x)
+                self.navigationController?.navigationBar.layer.isHidden = true
+            } else {
+                self.view.removeGestureRecognizer(sideMenuSwipeGestureRecogniser)
+                UIView.animate(withDuration: 0.5) {
+                    self.sideMenu.center.x -= self.sideMenu.bounds.width
+                }
+                self.navigationController?.navigationBar.layer.zPosition = 0
+                self.navigationController?.navigationBar.layer.isHidden = false
+                print(self.sideMenu.center.x)
+            }
+        }
+    }
+
     private var pets: [Pet] = []
     private var documents: [DocumentSnapshot] = []
     
@@ -81,6 +135,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     fileprivate func observeQuery() {
         guard let query = query else { return }
         stopObserving()
+        print("observeQuery")
         
         listener = query.addSnapshotListener { [unowned self] (snapshot, error) in
             guard let snapshot = snapshot else {
@@ -142,7 +197,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         super.viewDidLoad()
         petListView.delegate = self
         petListView.dataSource = self
-        query = baseQuery()
         
         filterStatusView.isHidden = true
         filterBarHeight.constant = 0
@@ -151,12 +205,27 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         sideMenu.layer.shadowColor = UIColor.black.cgColor
         sideMenu.layer.shadowOffset = CGSize(width: 5, height: 0)
         
-        sideMenuConstraint.constant = -200
+        // Ask for Authorisation from the User.
+        self.locationManager.requestAlwaysAuthorization()
+        
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        self.locationManager.distanceFilter = 50
+        self.locationManager.startUpdatingLocation()
+        self.locationManager.delegate = self
+        
+        sideMenuSwipeGestureRecogniser = UISwipeGestureRecognizer(target: self, action: #selector(hideSideBar))
+        sideMenuSwipeGestureRecogniser.direction = .left
+    }
+    
+    @objc func hideSideBar() {
+        sideMenuStatus = !sideMenuStatus
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        observeQuery()
         
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
             if let _ = auth.currentUser?.uid {
@@ -165,17 +234,19 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                 self.isSignin = false
             }
         }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        Auth.auth().removeStateDidChangeListener(handle!)
+        
+        query = baseQuery()
+        observeQuery()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        sideMenuStatus = false
+        self.navigationController?.navigationBar.layer.zPosition = 0
+        Auth.auth().removeStateDidChangeListener(handle!)
         stopObserving()
+        if sideMenuStatus {
+            sideMenuStatus = !sideMenuStatus
+        }
     }
     
     deinit {
@@ -194,12 +265,42 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         
-        let controller = SinglePetVC.fromStoryboard()
-        controller.pet = pets[indexPath.row]
-        controller.petReference = documents[indexPath.row].reference
-        self.navigationController?.pushViewController(controller, animated: true)
+        if !sideMenuStatus {
+            let controller = SinglePetVC.fromStoryboard()
+            controller.pet = pets[indexPath.row]
+            controller.petReference = documents[indexPath.row].reference
+            self.navigationController?.pushViewController(controller, animated: true)
+        } else {
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        if ownPetsList {
+            let reunitedMarker = UITableViewRowAction(style: .normal, title: "Reunited") { (action, index) in
+                let petReference = self.documents[indexPath.row].reference
+                petReference.updateData(["Status": "Reunited"])
+                alertMessage(in: self, title: "", message: "Congration")
+            }
+            reunitedMarker.backgroundColor = #colorLiteral(red: 0.1764705882, green: 0.8078431373, blue: 0.6352941176, alpha: 1)
+            let dismissedMarker = UITableViewRowAction(style: .normal, title: "Dismissed") { (action, index) in
+                let petReference = self.documents[indexPath.row].reference
+                petReference.updateData(["Status": "Dismissed"])
+                alertMessage(in: self, title: "", message: "Sorry about that")
+            }
+            
+            return [reunitedMarker, dismissedMarker]
+        }
+        
+        return []
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCellEditingStyle {
+        if ownPetsList {
+            return UITableViewCellEditingStyle.delete
+        }
+        return UITableViewCellEditingStyle.none
     }
 
     @IBAction func didTapFilter(_ sender: Any) {
@@ -208,7 +309,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     
     @IBAction func didTapClearFilter(_ sender: Any) {
         self.query = baseQuery()
-        observeQuery()
+        //observeQuery()
         filterStatusView.isHidden = true
         filterBarHeight.constant = 0
     }
@@ -275,6 +376,12 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             isFiltered = true
         }
         
+        if let longitude = filterVC.longitude, let latitude = filterVC.latitude {
+            pushCoordinates(lat: latitude, lon: longitude)
+            filtered = filtered.whereField("Latitude", isLessThan: restrictByLatMax)
+            filtered = filtered.whereField("Latitude", isGreaterThan: restrictByLatMin)
+        }
+        
         filterStatusView.isHidden = !isFiltered
         if isFiltered {
             filterBarHeight.constant = 44
@@ -282,8 +389,81 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             filterBarHeight.constant = 0
         }
         self.query = filtered
-        observeQuery()
+        //observeQuery()
+    }
+    
+    
+    func deg2rad(rad:Double) -> Double {
+        return rad * 180.0 / Double.pi
+    }
+    
+    func pushCoordinates(lat:Double , lon:Double){
+        //Search radius
+        var radius: Double
+        
+        if (UserDefaults.standard.object(forKey: "radius") != nil)
+        {
+            radius = UserDefaults.standard.double(forKey: "radius")
+        }
+        else
+        {
+            radius = Double(RADIUS)
+        }
+        
+        //Earth radius in kms
+        let R:Double = 6371
+        
+        /*https://www.movable-type.co.uk/scripts/latlong.html
+         Getting max and min coordinates with given position and using bearing:
+         0 for restrictByLatMax
+         pi for restrictByLatMin
+         pi/2 for restrictByLonMax
+         3*pi/2 for restrictByLonMin
+         */
+        restrictByLatMax = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(0))
+        restrictByLatMin = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi))
+        
+        var lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi/2));
+        restrictByLonMax = lon + atan2(sin(Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+        
+        lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(3*Double.pi/2));
+        restrictByLonMin = lon + atan2(sin(3*Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+        
     }
 }
 
-
+extension PetListTVC: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location: CLLocation = locations.last else { return }
+        pushCoordinates(lat: location.coordinate.latitude, lon: location.coordinate.longitude)
+        //var lastQuery = baseQuery()
+        //var lastQuery2 = baseQuery()
+        //lastQuery = lastQuery.whereField("Longitude", isLessThan: restrictByLonMax)
+        //lastQuery = lastQuery.whereField("Longitude", isGreaterThan: restrictByLonMin)
+        //lastQuery2 = lastQuery2.whereField("Latitude", isLessThan: restrictByLatMax)
+        //lastQuery2 = lastQuery2.whereField("Latitude", isGreaterThan: restrictByLatMin)
+        
+        //self.query = lastQuery;
+    }
+    
+    // Handle authorization for the location manager.
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .restricted:
+            print("Location access was restricted.")
+        case .denied:
+            print("User denied access to location.")
+        case .notDetermined:
+            print("Location status not determined.")
+        case .authorizedAlways: fallthrough
+        case .authorizedWhenInUse:
+            print("Location status is OK.")
+        }
+    }
+    
+    // Handle location manager errors.
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationManager.stopUpdatingLocation()
+    }
+}

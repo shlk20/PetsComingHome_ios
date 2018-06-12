@@ -10,14 +10,14 @@ import UIKit
 import Firebase
 import GoogleMaps
 
-class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
     
     let locationManager = CLLocationManager()
     
     private var handle: AuthStateDidChangeListenerHandle?
     private var _uid: String!
     private var selectedImage: UIImage?
-    private var needAdjustView = true
+    private var needAdjustView = false
 
     @IBOutlet weak var txtName: UITextField!
     @IBOutlet weak var txtBreed: UITextField!
@@ -55,6 +55,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         }
     }
     var location: (CLLocation, String)?
+    @IBOutlet weak var btnMap: StylesB!
     
     @IBAction func goToLibrary(_ sender: UIButton) {
         let image = UIImagePickerController()
@@ -145,6 +146,12 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        txtName.delegate = self
+        txtBreed.delegate = self
+        txtColor.delegate = self
+        txtAge.delegate = self
+        txtMcNumber.delegate = self
+        
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(AddPetVC.dismissKeyword))
         self.view.addGestureRecognizer(tapGestureRecognizer)
         
@@ -198,6 +205,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let pickerView = UIPickerView()
         pickerView.dataSource = self
         pickerView.delegate = self
+        pickerView.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return pickerView
     }()
     
@@ -205,6 +213,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let pickerView = UIPickerView()
         pickerView.dataSource = self
         pickerView.delegate = self
+        pickerView.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return pickerView
     }()
     
@@ -212,6 +221,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let pickerView = UIPickerView()
         pickerView.dataSource = self
         pickerView.delegate = self
+        pickerView.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return pickerView
     }()
     
@@ -219,6 +229,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let pickerView = UIPickerView()
         pickerView.dataSource = self
         pickerView.delegate = self
+        pickerView.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return pickerView
     }()
     
@@ -226,6 +237,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let pickerView = UIPickerView()
         pickerView.dataSource = self
         pickerView.delegate = self
+        pickerView.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return pickerView
     }()
     
@@ -233,6 +245,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = UIDatePickerMode.date
         datePicker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
+        datePicker.frame = CGRect(x: 0, y: 0, width: 320, height: 150)
         return datePicker
     }()
     
@@ -299,6 +312,20 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
             fatalError("Unhandled picker view: \(pickerView)")
         }
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        if textField == self.txtName {
+            self.txtBreed.becomeFirstResponder()
+        } else if textField == self.txtBreed {
+            self.txtColor.becomeFirstResponder()
+        } else if textField == self.txtColor {
+            self.txtAge.becomeFirstResponder()
+        } else if textField == self.txtAge {
+            self.txtMcNumber.becomeFirstResponder()
+        }
+        return true
+    }
 }
 
 extension AddPetVC: CLLocationManagerDelegate {
@@ -307,7 +334,9 @@ extension AddPetVC: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         GMSGeocoder().reverseGeocodeCoordinate(CLLocationCoordinate2D(latitude: locations.last!.coordinate.latitude, longitude: locations.last!.coordinate.longitude)) { (result, error) in
             if let address = result?.firstResult() {
-                self.location = (locations.last!, address.subLocality! + ", " + address.locality!)
+                let subLocality = address.subLocality ?? (address.locality ?? "")
+                let locality = address.locality ?? ""
+                self.location = (locations.last!, subLocality + ", " + locality)
             }
         }
     }

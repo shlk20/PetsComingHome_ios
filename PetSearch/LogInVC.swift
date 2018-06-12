@@ -14,8 +14,8 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
 
     var handle: AuthStateDidChangeListenerHandle?
     
-    @IBOutlet weak var txtEmail: RemoveCursor!
-    @IBOutlet weak var txtPassword: RemoveCursor!
+    @IBOutlet weak var txtEmail: UITextField!
+    @IBOutlet weak var txtPassword: UITextField!
     var btnGoogleSignIn: GIDSignInButton!
     
     static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> LogInVC {
@@ -63,7 +63,8 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
         btnGoogleSignIn = GIDSignInButton()
         btnGoogleSignIn.style = .standard
         btnGoogleSignIn.colorScheme = .dark
-        btnGoogleSignIn.center = view.center
+        btnGoogleSignIn.center.x = view.center.x
+        btnGoogleSignIn.center.y = view.center.y + 80
         view.addSubview(btnGoogleSignIn)
         
         NotificationCenter.default.addObserver(self, selector: #selector(LogInVC.receiveToggleAuthUINotification(_:)), name: NSNotification.Name(rawValue: "ToggleAuthUINotification"), object: nil)
@@ -85,7 +86,6 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
                     }
         
                     if let currentUser = authResult?.user {
-                        print("auth successful. \(currentUser.uid)")
                         Firestore.firestore().collection(User.TableName).whereField("Uid", isEqualTo: currentUser.uid).getDocuments(completion: { (snapshot, error) in
                             guard let documents = snapshot?.documents else { return }
                             self.removeSpinner(spinner: sv)
@@ -97,6 +97,7 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
                             }
                             for document in documents {
                                 let user = User(dictionary: document.data())
+                                UserDefaults.standard.set(user?.Uid, forKey: "UserId")
                                 UserDefaults.standard.set(user?.Username, forKey: "DisplayName")
                                 UserDefaults.standard.set(2, forKey: "SigninType") // google account
                                 self.navigationController?.popToRootViewController(animated: true)

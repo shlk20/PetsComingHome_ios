@@ -12,31 +12,18 @@ import GoogleSignIn
 
 class RegisterVC: UIViewController {
 
-    var handle: AuthStateDidChangeListenerHandle?
+    private var handle: AuthStateDidChangeListenerHandle?
     
-    @IBOutlet weak var txtName: RemoveCursor!
-    @IBOutlet weak var txtEmail: RemoveCursor!
-    @IBOutlet weak var txtPhoneNumber: RemoveCursor!
-    @IBOutlet weak var txtPassword: RemoveCursor!
-    @IBOutlet weak var txtConfirmPassword: RemoveCursor!
+    @IBOutlet weak var txtName: UITextField!
+    @IBOutlet weak var txtEmail: UITextField!
+    @IBOutlet weak var txtPhoneNumber: UITextField!
+    @IBOutlet weak var txtPassword: UITextField!
+    @IBOutlet weak var txtConfirmPassword: UITextField!
     var googleAccount: AuthDataResult?
     
     static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> RegisterVC {
         let controller = storyboard.instantiateViewController(withIdentifier: "RegisterVC") as! RegisterVC
         return controller
-    }
-    
-    fileprivate func saveUser(_ user: User) {
-        Firestore.firestore().collection(User.TableName).document(user.Uid).setData(user.dictionary, completion: { (error) in
-            if let error = error {
-                alertMessage(in: self, title: "", message: "Register failed. \(error.localizedDescription)")
-            } else {
-                UserDefaults.standard.set(user.Username, forKey: "DisplayName")
-                alertMessage(in: self, title: "", message: "Thank you for your registration", callback: { (action) in
-                    self.navigationController?.popToRootViewController(animated: true)
-                })
-            }
-        })
     }
     
     @IBAction func didRegister(_ sender: UIButton) {
@@ -69,6 +56,20 @@ class RegisterVC: UIViewController {
                 alertMessage(in: self, title: "", message: "Password does not match")
             }
         }
+    }
+    
+    private func saveUser(_ user: User) {
+        Firestore.firestore().collection(User.TableName).document(user.Uid).setData(user.dictionary, completion: { (error) in
+            if let error = error {
+                alertMessage(in: self, title: "", message: "Register failed. \(error.localizedDescription)")
+            } else {
+                UserDefaults.standard.set(user.Uid, forKey: "UserId")
+                UserDefaults.standard.set(user.Username, forKey: "DisplayName")
+                alertMessage(in: self, title: "", message: "Thank you for your registration", callback: { (action) in
+                    self.navigationController?.popToRootViewController(animated: true)
+                })
+            }
+        })
     }
     
     override func viewDidLoad() {
