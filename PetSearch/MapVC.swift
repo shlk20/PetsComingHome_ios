@@ -71,10 +71,10 @@ class MapVC: UIViewController, GMSMapViewDelegate {
                     marker.map = mapView
                     confirmMessage(in: self, message: "Would you like to use this coordinate?", confirmText: "OK", confirmMethod: { (action) in
                         let delegateController = self.delegateController as! AddPetVC
-                        let subLocality = address.subLocality ?? (address.locality ?? "")
+                        //let subLocality = address.subLocality ?? (address.locality ?? "")
                         let locality = address.locality ?? ""
-                        delegateController.location = (CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude), subLocality + ", " + locality)
-                        delegateController.btnMap.setTitle(subLocality + ", " + locality, for: .normal)
+                        delegateController.location = (CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude), locality)
+                        delegateController.btnMap.setTitle(locality, for: .normal)
                         self.navigationController?.popViewController(animated: true)
                     }, cancel: nil)
                 }
@@ -89,9 +89,9 @@ class MapVC: UIViewController, GMSMapViewDelegate {
                         let delegateController = self.delegateController as! FilterVC
                         delegateController.latitude = coordinate.latitude
                         delegateController.longitude = coordinate.longitude
-                        let subLocality = address.subLocality ?? (address.locality ?? "")
+                        //let subLocality = address.subLocality ?? (address.locality ?? "")
                         let locality = address.locality ?? ""
-                        delegateController.btnMap.setTitle(subLocality + ", " + locality, for: .normal)
+                        delegateController.btnMap.setTitle(locality, for: .normal)
                         self.navigationController?.popViewController(animated: true)
                     }, cancel: nil)
                 }

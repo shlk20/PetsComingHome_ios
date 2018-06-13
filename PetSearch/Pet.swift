@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Pet {
+struct Pet: Hashable {
     static let TableName = "Pet"
     var PetId: String
     var Uid: String
@@ -68,27 +68,25 @@ extension Pet: DocumentSerializable {
     init?(dictionary: [String: Any]) {
         guard let petId = dictionary["PetId"] as? String,
             let uid = dictionary["Uid"] as? String,
-            let name = dictionary["Name"] as? String,
-            let breed = dictionary["Breed"] as? String,
-            let color = dictionary["Color"] as? String,
-            let age = dictionary["Age"] as? Int,
-            let microchipNumber = dictionary["MicrochipNumber"] as? String,
+            let size = dictionary["Size"] as? String,
+            let kind = dictionary["Kind"] as? String,
+            let status = dictionary["Status"] as? String,
             let photo = dictionary["Photo"] as? String
             else { return nil }
         
         self.init(PetId: petId,
                   Uid: uid,
-                  Name: name,
-                  Breed: breed,
-                  Color: color,
-                  Age: age,
-                  MicrochipNumber: microchipNumber,
+                  Name: dictionary["Name"] as? String ?? "",
+                  Breed: dictionary["Breed"] as? String ?? "",
+                  Color: dictionary["Color"] as? String ?? "",
+                  Age: dictionary["Age"] as? Int ?? 0,
+                  MicrochipNumber: dictionary["MicrochipNumber"] as? String ?? "",
                   Photo: photo,
-                  Size: dictionary["Size"] as? String ?? "",
-                  Kind: dictionary["Kind"] as? String ?? "",
+                  Size: size,
+                  Kind: kind,
                   Gender: dictionary["Gender"] as? String ?? "",
                   Desexed: dictionary["Desexed"] as? String ?? "",
-                  Status: dictionary["Status"] as? String ?? "",
+                  Status: status,
                   MissingSince: dictionary["MissingSince"] as? UInt64 ?? Date().timestamp,
                   Description: dictionary["Description"] as? String ?? "",
                   Latitude: dictionary["Latitude"] as? Double ?? 0.00,

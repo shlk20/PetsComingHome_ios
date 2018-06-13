@@ -28,11 +28,12 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     var restrictByLatMax: Double = 0.0
     var restrictByLonMin: Double = 0.0
     var restrictByLonMax: Double = 0.0
+    var currentLatitude: Double = 0.0
+    var currentLongitude: Double = 0.0
     
     var ownPetsList = false {
         didSet {
             if ownPetsList, let uid = UserDefaults.standard.string(forKey: "UserId") {
-                print("Own Pets List")
                 var baseQuery = self.baseQuery()
                 baseQuery = baseQuery.whereField("Uid", isEqualTo: uid)
                 self.query = baseQuery
@@ -53,48 +54,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         }
     }
     
-    @IBAction func didTapSignButton(_ sender: Any) {
-        if isSignin {
-            // sign out
-            do {
-                try Auth.auth().signOut()
-                if UserDefaults.standard.integer(forKey: "SigninType") == 2 {
-                    GIDSignIn.sharedInstance().disconnect()
-                    GIDSignIn.sharedInstance().signOut()
-                }
-                UserDefaults.standard.removeObject(forKey: "UserId")
-                UserDefaults.standard.removeObject(forKey: "DisplayName")
-                UserDefaults.standard.removeObject(forKey: "SigninType")
-                isSignin = false
-            } catch let signOutError as NSError {
-                alertMessage(in: self, title: "", message: "Error signing out: \(signOutError)")
-            }
-        } else {
-            // sign in
-            performSegue(withIdentifier: "showLoginView", sender: sender)
-        }
-    }
-    
-    @IBAction func didTapSettings(_ sender: Any) {
-        performSegue(withIdentifier: "showSettings", sender: sender)
-    }
-    
-    @IBAction func didTapPetsList(_ sender: Any) {
-        ownPetsList = false
-        sideMenuStatus = false
-    }
-    
-    @IBAction func didTapMyPets(_ sender: Any) {
-        if isSignin {
-            ownPetsList = true
-            sideMenuStatus = false
-        } else {
-            alertMessage(in: self, title: "", message: "Please sign in first") { (action) in
-                self.performSegue(withIdentifier: "showLoginView", sender: sender)
-            }
-        }
-    }
-    
     @IBOutlet weak var sideMenu: UIView!
     private var sideMenuStatus = false { // false means the side menu is hidden
         didSet {
@@ -104,7 +63,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                     //self.sideMenuConstraint.constant += 100
                     self.sideMenu.center.x += self.sideMenu.bounds.width
                 }
-                print(self.sideMenu.center.x)
+                //print(self.sideMenu.center.x)
                 self.navigationController?.navigationBar.layer.isHidden = true
             } else {
                 self.view.removeGestureRecognizer(sideMenuSwipeGestureRecogniser)
@@ -113,7 +72,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                 }
                 self.navigationController?.navigationBar.layer.zPosition = 0
                 self.navigationController?.navigationBar.layer.isHidden = false
-                print(self.sideMenu.center.x)
+                //print(self.sideMenu.center.x)
             }
         }
     }
@@ -135,27 +94,55 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     fileprivate func observeQuery() {
         guard let query = query else { return }
         stopObserving()
-        print("observeQuery")
         
-        listener = query.addSnapshotListener { [unowned self] (snapshot, error) in
-            guard let snapshot = snapshot else {
-                print("Cannot fetch results: \(error!)")
-                return
-            }
-            
-            let models = snapshot.documents.map { (document) -> Pet in
-                if let model = Pet(dictionary: document.data()) {
-                    return model
-                } else {
-                    print("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
-                    fatalError("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
+        if restrictByLatMax != 0.0, restrictByLonMax != 0.0, !ownPetsList {
+            var petsFIlter: [Pet] = []
+            var documentsFilter: [DocumentSnapshot] = []
+            // do range filter
+            let queryFilter = query.whereField("Longitude", isLessThanOrEqualTo: restrictByLonMax).whereField("Longitude", isGreaterThanOrEqualTo: restrictByLonMin)
+            listener = queryFilter.addSnapshotListener { (snapshot, error) in
+                guard let snapshot = snapshot else {
+                    return
                 }
+                let _ = snapshot.documents.map { (document) -> Bool in
+                    guard let model = Pet(dictionary: document.data()) else { return false }
+                    
+                    if model.Latitude >= self.restrictByLatMin, model.Latitude <= self.restrictByLatMax {
+                        petsFIlter.append(model)
+                        documentsFilter.append(document)
+                    }
+                    
+                    return true
+                }
+                
+                self.pets = petsFIlter
+                self.documents = documentsFilter
+                
+                self.petListView.reloadData()
             }
             
-            self.pets = models
-            self.documents = snapshot.documents
-            
-            self.petListView.reloadData()
+        } else {
+            print("without coordinates filter")
+            listener = query.addSnapshotListener { [unowned self] (snapshot, error) in
+                guard let snapshot = snapshot else {
+                    print("Cannot fetch results: \(error!)")
+                    return
+                }
+                
+                let models = snapshot.documents.map { (document) -> Pet in
+                    if let model = Pet(dictionary: document.data()) {
+                        return model
+                    } else {
+                        print("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
+                        fatalError("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
+                    }
+                }
+                
+                self.pets = models
+                self.documents = snapshot.documents
+                
+                self.petListView.reloadData()
+            }
         }
     }
     
@@ -189,6 +176,49 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         self.navigationController?.pushViewController(controller, animated: true)
     }
     
+    @IBAction func didTapSignButton(_ sender: Any) {
+        if isSignin {
+            // sign out
+            do {
+                try Auth.auth().signOut()
+                if UserDefaults.standard.integer(forKey: "SigninType") == 2 {
+                    GIDSignIn.sharedInstance().disconnect()
+                    GIDSignIn.sharedInstance().signOut()
+                }
+                UserDefaults.standard.removeObject(forKey: "UserId")
+                UserDefaults.standard.removeObject(forKey: "DisplayName")
+                UserDefaults.standard.removeObject(forKey: "SigninType")
+                sideMenuStatus = false
+                isSignin = false
+            } catch let signOutError as NSError {
+                alertMessage(in: self, title: "", message: "Error signing out: \(signOutError)")
+            }
+        } else {
+            // sign in
+            performSegue(withIdentifier: "showLoginView", sender: sender)
+        }
+    }
+    
+    @IBAction func didTapSettings(_ sender: Any) {
+        performSegue(withIdentifier: "showSettings", sender: sender)
+    }
+    
+    @IBAction func didTapPetsList(_ sender: Any) {
+        ownPetsList = false
+        sideMenuStatus = false
+    }
+    
+    @IBAction func didTapMyPets(_ sender: Any) {
+        if isSignin {
+            ownPetsList = true
+            sideMenuStatus = false
+        } else {
+            alertMessage(in: self, title: "", message: "Please sign in first") { (action) in
+                self.performSegue(withIdentifier: "showLoginView", sender: sender)
+            }
+        }
+    }
+    
     @IBAction func toggleSideMenu(_ sender: Any) {
         sideMenuStatus = !sideMenuStatus
     }
@@ -204,9 +234,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         blurView.layer.cornerRadius = 15
         sideMenu.layer.shadowColor = UIColor.black.cgColor
         sideMenu.layer.shadowOffset = CGSize(width: 5, height: 0)
-        
-        // Ask for Authorisation from the User.
-        self.locationManager.requestAlwaysAuthorization()
         
         // For use in foreground
         self.locationManager.requestWhenInUseAuthorization()
@@ -235,7 +262,28 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             }
         }
         
-        query = baseQuery()
+        if !ownPetsList {
+            print("back to home")
+            print("Radius: \(UserDefaults.standard.double(forKey: "radius"))")
+            pushCoordinates(lat: currentLatitude, lon: currentLongitude)
+            var baseQuery = self.baseQuery()
+            if (UserDefaults.standard.object(forKey: "showLostPetsAllowed") != nil)
+            {
+                if !UserDefaults.standard.bool(forKey: "showLostPetsAllowed") {
+                    baseQuery = baseQuery.whereField("Status", isEqualTo: "Found")
+                    baseQuery = baseQuery.whereField("Status", isEqualTo: "Missed")
+                }
+            }
+            if (UserDefaults.standard.object(forKey: "showFoundPetsAllowed") != nil)
+            {
+                if !UserDefaults.standard.bool(forKey: "showFoundPetsAllowed") {
+                    baseQuery = baseQuery.whereField("Status", isEqualTo: "Lost")
+                    baseQuery = baseQuery.whereField("Status", isEqualTo: "Missed")
+                }
+            }
+            query = baseQuery
+        }
+        
         observeQuery()
     }
     
@@ -265,7 +313,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        print(indexPath)
         if !sideMenuStatus {
             let controller = SinglePetVC.fromStoryboard()
             controller.pet = pets[indexPath.row]
@@ -278,19 +326,13 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         if ownPetsList {
-            let reunitedMarker = UITableViewRowAction(style: .normal, title: "Reunited") { (action, index) in
-                let petReference = self.documents[indexPath.row].reference
-                petReference.updateData(["Status": "Reunited"])
-                alertMessage(in: self, title: "", message: "Congration")
-            }
-            reunitedMarker.backgroundColor = #colorLiteral(red: 0.1764705882, green: 0.8078431373, blue: 0.6352941176, alpha: 1)
             let dismissedMarker = UITableViewRowAction(style: .normal, title: "Dismissed") { (action, index) in
                 let petReference = self.documents[indexPath.row].reference
                 petReference.updateData(["Status": "Dismissed"])
                 alertMessage(in: self, title: "", message: "Sorry about that")
             }
             
-            return [reunitedMarker, dismissedMarker]
+            return [dismissedMarker]
         }
         
         return []
@@ -308,6 +350,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     }
     
     @IBAction func didTapClearFilter(_ sender: Any) {
+        pushCoordinates(lat: currentLatitude, lon: currentLongitude)
         self.query = baseQuery()
         //observeQuery()
         filterStatusView.isHidden = true
@@ -366,11 +409,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             isFiltered = true
         }
         
-        if let status = filterVC.txtStatus.text, !status.isEmpty {
-            filtered = filtered.whereField("Status", isEqualTo: status)
-            isFiltered = true
-        }
-        
         if let missingSince = filterVC.txtSince.text, !missingSince.isEmpty {
             filtered = filtered.whereField("MissingSince", isEqualTo: missingSince)
             isFiltered = true
@@ -378,8 +416,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         
         if let longitude = filterVC.longitude, let latitude = filterVC.latitude {
             pushCoordinates(lat: latitude, lon: longitude)
-            filtered = filtered.whereField("Latitude", isLessThan: restrictByLatMax)
-            filtered = filtered.whereField("Latitude", isGreaterThan: restrictByLatMin)
+            isFiltered = true
         }
         
         filterStatusView.isHidden = !isFiltered
@@ -394,7 +431,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     
     
     func deg2rad(rad:Double) -> Double {
-        return rad * 180.0 / Double.pi
+        return rad * Double.pi / 180
     }
     
     func pushCoordinates(lat:Double , lon:Double){
@@ -411,7 +448,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         }
         
         //Earth radius in kms
-        let R:Double = 6371
+        //let R:Double = 6371
         
         /*https://www.movable-type.co.uk/scripts/latlong.html
          Getting max and min coordinates with given position and using bearing:
@@ -420,14 +457,19 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
          pi/2 for restrictByLonMax
          3*pi/2 for restrictByLonMin
          */
-        restrictByLatMax = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(0))
-        restrictByLatMin = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi))
+        //restrictByLatMax = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(0))
+        //restrictByLatMin = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi))
+        restrictByLatMin = lat - (radius / 69)
+        restrictByLatMax = lat + (radius / 69)
         
-        var lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi/2));
-        restrictByLonMax = lon + atan2(sin(Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+//        var lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi/2));
+//        print("Lat 2 \(lat2)")
+//        restrictByLonMax = lon + atan2(sin(Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+        restrictByLonMin = lon - radius / fabs(cos(deg2rad(rad: lat))*69)
+        restrictByLonMax = lon + radius / fabs(cos(deg2rad(rad: lat))*69)
         
-        lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(3*Double.pi/2));
-        restrictByLonMin = lon + atan2(sin(3*Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+//        lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(3*Double.pi/2));
+//        restrictByLonMin = lon + atan2(sin(3*Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
         
     }
 }
@@ -437,14 +479,9 @@ extension PetListTVC: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location: CLLocation = locations.last else { return }
         pushCoordinates(lat: location.coordinate.latitude, lon: location.coordinate.longitude)
-        //var lastQuery = baseQuery()
-        //var lastQuery2 = baseQuery()
-        //lastQuery = lastQuery.whereField("Longitude", isLessThan: restrictByLonMax)
-        //lastQuery = lastQuery.whereField("Longitude", isGreaterThan: restrictByLonMin)
-        //lastQuery2 = lastQuery2.whereField("Latitude", isLessThan: restrictByLatMax)
-        //lastQuery2 = lastQuery2.whereField("Latitude", isGreaterThan: restrictByLatMin)
-        
-        //self.query = lastQuery;
+        currentLatitude = location.coordinate.latitude
+        currentLongitude = location.coordinate.longitude
+        observeQuery()
     }
     
     // Handle authorization for the location manager.

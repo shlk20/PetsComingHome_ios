@@ -44,7 +44,7 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, 
         let commentId = UUID.init().uuidString
         let date = NSDate().description
         let username = UserDefaults.standard.string(forKey: "DisplayName")
-        let comment = Comment(CommentId: commentId, ParentCommentId: "-1", Uid: uid, Username: username!, PetId: petId, Text: inputComment.text!, Date: date)
+        let comment = Comment(CommentId: commentId, Uid: uid, Username: username!, PetId: petId, Text: inputComment.text!, Date: date)
 
         Firestore.firestore().collection(Pet.TableName).document(petId).collection(Comment.TableName).addDocument(data: comment.dictionary) { (error) in
             self.removeSpinner(spinner: sv)

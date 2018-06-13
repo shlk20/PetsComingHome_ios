@@ -11,7 +11,6 @@ import Foundation
 struct Comment {
     static let TableName = "Comment"
     var CommentId: String
-    var ParentCommentId: String
     var Uid: String
     var Username: String
     var PetId: String
@@ -21,7 +20,6 @@ struct Comment {
     var dictionary: [String: Any] {
         return [
             "CommentId": CommentId,
-            "ParentCommentId": ParentCommentId,
             "Uid": Uid,
             "Username": Username,
             "PetId": PetId,
@@ -34,7 +32,6 @@ struct Comment {
 extension Comment: DocumentSerializable {
     init?(dictionary: [String : Any]) {
         guard let commentId = dictionary["CommentId"] as? String,
-            let parentCommentId = dictionary["ParentCommentId"] as? String,
             let uid = dictionary["Uid"] as? String,
             let username = dictionary["Username"] as? String,
             let petId = dictionary["PetId"] as? String,
@@ -43,7 +40,6 @@ extension Comment: DocumentSerializable {
         
         self.init(
             CommentId: commentId,
-            ParentCommentId: parentCommentId,
             Uid: uid,
             Username: username,
             PetId: petId,

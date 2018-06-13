@@ -107,6 +107,7 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
                 }
             } else {
                 alertMessage(in: self, title: "", message: "Fail to sign in with Google")
+                self.removeSpinner(spinner: sv)
             }
         }
     }

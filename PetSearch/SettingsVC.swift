@@ -15,7 +15,9 @@ let RADIUS : Int = 10
 class SettingsVC: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var txtRadius: UITextField!
-    //@IBOutlet weak var swNotifications: UISwitch!
+    @IBOutlet weak var swShowLostPets: UISwitch!
+    @IBOutlet weak var swShowFoundPets: UISwitch!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -29,21 +31,37 @@ class SettingsVC: UIViewController, UITextFieldDelegate {
             self.txtRadius.text = String(RADIUS)
         }
         
-//        if (UserDefaults.standard.object(forKey: "notificationsAllowed") != nil)
-//        {
-//            if (UserDefaults.standard.object(forKey: "notificationsAllowed") as! Bool)
-//            {
-//              self.swNotifications.setOn(true, animated: false)
-//            }
-//            else
-//            {
-//                self.swNotifications.setOn(false, animated: false)
-//            }
-//        }
-//        else
-//        {
-//            self.swNotifications.setOn(true, animated: false)
-//        }
+        if (UserDefaults.standard.object(forKey: "showLostPetsAllowed") != nil)
+        {
+            if (UserDefaults.standard.object(forKey: "showLostPetsAllowed") as! Bool)
+            {
+              self.swShowLostPets.setOn(true, animated: false)
+            }
+            else
+            {
+                self.swShowLostPets.setOn(false, animated: false)
+            }
+        }
+        else
+        {
+            self.swShowLostPets.setOn(true, animated: false)
+        }
+        
+        if (UserDefaults.standard.object(forKey: "showFoundPetsAllowed") != nil)
+        {
+            if (UserDefaults.standard.object(forKey: "showFoundPetsAllowed") as! Bool)
+            {
+                self.swShowFoundPets.setOn(true, animated: false)
+            }
+            else
+            {
+                self.swShowFoundPets.setOn(false, animated: false)
+            }
+        }
+        else
+        {
+            self.swShowFoundPets.setOn(true, animated: false)
+        }
         
         self.txtRadius.delegate = self
         // Do any additional setup after loading the view.
@@ -68,37 +86,25 @@ class SettingsVC: UIViewController, UITextFieldDelegate {
         UserDefaults.standard.synchronize()
     }
     
-
-    
-//    @IBAction func didSwitchedNotifications(_ sender: UISwitch) {
-//        if (sender.isOn)
-//        {
-//            UserDefaults.standard.set(true, forKey: "notificationsAllowed")
-//            UserDefaults.standard.synchronize()
-//        }
-//        else
-//        {
-//            UserDefaults.standard.set(false, forKey: "notificationsAllowed")
-//            UserDefaults.standard.synchronize()
-//        }
-//    }
-
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    override func viewWillDisappear(_ animated: Bool) {
+        UserDefaults.standard.set(txtRadius.text, forKey: "radius")
+        UserDefaults.standard.synchronize()
     }
-    */
+
+    @IBAction func didSwitchedNotifications(_ sender: UISwitch) {
+        guard let identifier = sender.restorationIdentifier else {
+            return
+        }
+        if (sender.isOn)
+        {
+            UserDefaults.standard.set(true, forKey: identifier)
+            UserDefaults.standard.synchronize()
+        }
+        else
+        {
+            UserDefaults.standard.set(false, forKey: identifier)
+            UserDefaults.standard.synchronize()
+        }
+    }
 
 }
-
-
-/*
- Added StylesNC, StylesB, SettingsVC,
- Changed Main.stroyboard, PetListTVC
- */

@@ -24,6 +24,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     @IBOutlet weak var txtColor: UITextField!
     @IBOutlet weak var txtAge: UITextField!
     @IBOutlet weak var txtMcNumber: UITextField!
+    @IBOutlet weak var txtDescription: UITextField!
     @IBOutlet weak var txtSize: RemoveCursor! {
         didSet {
             txtSize.inputView = sizePickerView
@@ -86,11 +87,10 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
     @IBAction func didAddPet(_ sender: UIButton) {
         let sv = self.displaySpinner(onView: self.view)
         
-        guard let name = txtName.text, !name.isEmpty,
-            let breed = txtBreed.text, !breed.isEmpty,
-            let age = txtAge.text, !age.isEmpty,
-            let color = txtColor.text, !color.isEmpty,
-            let mcNumber = txtMcNumber.text, !mcNumber.isEmpty,
+        guard let kind = txtKind.text, !kind.isEmpty,
+            let size = txtSize.text, !size.isEmpty,
+            let status = txtStatus.text, !status.isEmpty,
+            let since = txtSince.text, !since.isEmpty,
             let image = selectedImage else {
                 alertMessage(in: self, title: "", message: "Please input required fileds", callback: { (action) in
                     self.removeSpinner(spinner: sv)
@@ -99,20 +99,20 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
         }
         
         let petId = UUID.init().uuidString
-        let kind = txtKind?.text ?? ""
+        let name = txtName?.text ?? ""
+        let breed = txtBreed?.text ?? ""
+        let age = txtAge?.text ?? ""
+        let color = txtColor?.text ?? ""
+        let mcNumber = txtMcNumber?.text ?? ""
         let gender = txtGender?.text ?? ""
         let desexed = txtDesexed?.text ?? ""
-        let size = txtSize?.text ?? ""
-        let status = txtStatus?.text ?? ""
+        let description = txtDescription?.text ?? ""
         
         var sinceTimestamp = UInt64(0)
-        if let since = txtSince?.text {
-            print(since)
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd'/'MM'/'yyyy"
-            sinceTimestamp = UInt64(dateFormatter.date(from: since)!.timestamp)
-        }
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd'/'MM'/'yyyy"
+        sinceTimestamp = UInt64(dateFormatter.date(from: since)!.timestamp)
             
         var imageData = Data()
         imageData = UIImageJPEGRepresentation(image, 0.1)! as Data  //compress the image and makes it to be the Data type
@@ -126,7 +126,7 @@ class AddPetVC: UIViewController, UIImagePickerControllerDelegate, UINavigationC
                 return
             }
             if metadata.size > 0 {
-                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: Int(age)!, MicrochipNumber: mcNumber, Photo: "images/" + imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: sinceTimestamp, Description: "", Latitude: self.location!.0.coordinate.latitude, Longitude: self.location!.0.coordinate.longitude, Region: self.location!.1)
+                let pet = Pet(PetId: petId, Uid: self._uid, Name: name, Breed: breed, Color: color, Age: Int(age) ?? 0, MicrochipNumber: mcNumber, Photo: "images/" + imageId, Size: size, Kind: kind, Gender: gender, Desexed: desexed, Status: status, MissingSince: sinceTimestamp, Description: description, Latitude: self.location!.0.coordinate.latitude, Longitude: self.location!.0.coordinate.longitude, Region: self.location!.1)
                 
                 Firestore.firestore().collection(Pet.TableName).document(petId).setData(pet.dictionary, completion: { (error) in
                     self.removeSpinner(spinner: sv)
@@ -334,9 +334,9 @@ extension AddPetVC: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         GMSGeocoder().reverseGeocodeCoordinate(CLLocationCoordinate2D(latitude: locations.last!.coordinate.latitude, longitude: locations.last!.coordinate.longitude)) { (result, error) in
             if let address = result?.firstResult() {
-                let subLocality = address.subLocality ?? (address.locality ?? "")
+                //let subLocality = address.subLocality ?? (address.locality ?? "")
                 let locality = address.locality ?? ""
-                self.location = (locations.last!, subLocality + ", " + locality)
+                self.location = (locations.last!, locality)
             }
         }
     }
