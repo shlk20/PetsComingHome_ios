@@ -32,7 +32,7 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, 
     }
     
     @IBAction func didSendButton(_ sender: Any) {
-        guard let uid = Auth.auth().currentUser?.uid else {
+        guard let _ = Auth.auth().currentUser?.uid else {
             alertMessage(in: self, title: "", message: "Please login in first") { (action) in
                 let controller = LogInVC.fromStoryboard()
                 self.navigationController?.pushViewController(controller, animated: true)
@@ -41,10 +41,10 @@ class CommentsVC: UIViewController, UITextFieldDelegate, UITableViewDataSource, 
         }
         
         let sv = self.displaySpinner(onView: self.view)
-        let commentId = UUID.init().uuidString
-        let date = NSDate().description
+        let date = Date().timestamp
         let username = UserDefaults.standard.string(forKey: "DisplayName")
-        let comment = Comment(CommentId: commentId, Uid: uid, Username: username!, PetId: petId, Text: inputComment.text!, Date: date)
+        let email = UserDefaults.standard.string(forKey: "Email")
+        let comment = Comment(UserDisplayName: username!, UserEmail: email!, Text: inputComment.text!, Date: date)
 
         Firestore.firestore().collection(Pet.TableName).document(petId).collection(Comment.TableName).addDocument(data: comment.dictionary) { (error) in
             self.removeSpinner(spinner: sv)
@@ -152,7 +152,7 @@ class CommentTableViewCell: UITableViewCell {
     @IBOutlet weak var messageBody: UILabel!
     
     func popluate(comment: Comment, publisher: String) {
-        lblSender.text = comment.Username
+        lblSender.text = comment.UserDisplayName
         messageBody.text = comment.Text
     }
 }

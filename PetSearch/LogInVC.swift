@@ -97,6 +97,7 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
                             }
                             for document in documents {
                                 let user = User(dictionary: document.data())
+                                UserDefaults.standard.set(user?.Email, forKey: "Email")
                                 UserDefaults.standard.set(user?.Uid, forKey: "UserId")
                                 UserDefaults.standard.set(user?.Username, forKey: "DisplayName")
                                 UserDefaults.standard.set(2, forKey: "SigninType") // google account

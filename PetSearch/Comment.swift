@@ -10,19 +10,15 @@ import Foundation
 
 struct Comment {
     static let TableName = "Comment"
-    var CommentId: String
-    var Uid: String
-    var Username: String
-    var PetId: String
+    var UserDisplayName: String
+    var UserEmail: String
     var Text: String
-    var Date: String
+    var Date: UInt64
     
     var dictionary: [String: Any] {
         return [
-            "CommentId": CommentId,
-            "Uid": Uid,
-            "Username": Username,
-            "PetId": PetId,
+            "UserEmail": UserEmail,
+            "UserDisplayName": UserDisplayName,
             "Text": Text,
             "Date": Date
         ]
@@ -31,18 +27,14 @@ struct Comment {
 
 extension Comment: DocumentSerializable {
     init?(dictionary: [String : Any]) {
-        guard let commentId = dictionary["CommentId"] as? String,
-            let uid = dictionary["Uid"] as? String,
-            let username = dictionary["Username"] as? String,
-            let petId = dictionary["PetId"] as? String,
+        guard let userDisplayName = dictionary["UserDisplayName"] as? String,
+            let userEmail = dictionary["UserEmail"] as? String,
             let text = dictionary["Text"] as? String,
-            let date = dictionary["Date"] as? String else { return nil }
+            let date = dictionary["Date"] as? UInt64 else { return nil }
         
         self.init(
-            CommentId: commentId,
-            Uid: uid,
-            Username: username,
-            PetId: petId,
+            UserDisplayName: userDisplayName,
+            UserEmail: userEmail,
             Text: text,
             Date: date
         )

@@ -64,6 +64,7 @@ class RegisterVC: UIViewController {
                 alertMessage(in: self, title: "", message: "Register failed. \(error.localizedDescription)")
             } else {
                 UserDefaults.standard.set(user.Uid, forKey: "UserId")
+                UserDefaults.standard.set(user.Email, forKey: "Email")
                 UserDefaults.standard.set(user.Username, forKey: "DisplayName")
                 alertMessage(in: self, title: "", message: "Thank you for your registration", callback: { (action) in
                     self.navigationController?.popToRootViewController(animated: true)
