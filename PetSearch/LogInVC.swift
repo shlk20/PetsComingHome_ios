@@ -37,6 +37,8 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
                             self.removeSpinner(spinner: sv)
                             for document in documents {
                                 let user = User(dictionary: document.data())
+                                UserDefaults.standard.set(user?.Email, forKey: "Email")
+                                UserDefaults.standard.set(user?.Uid, forKey: "UserId")
                                 UserDefaults.standard.set(user?.Username, forKey: "DisplayName")
                                 UserDefaults.standard.set(1, forKey: "SigninType") // email 
                             }
