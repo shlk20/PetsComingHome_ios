@@ -23,20 +23,18 @@ class PetTableViewCell: UITableViewCell {
     
     func popluate(pet: Pet) {
         if let imageFromCache = imageCache.object(forKey: pet.Photo as AnyObject) {
-            print("cache")
             self.petImage.image = imageFromCache
         } else {
-//            print("load")
-//            let imageRef = Storage.storage().reference().child(pet.Photo)
-//            imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-//                guard let data = data else {
-//                    return
-//                }
-//                let image = UIImage(data: data)
-//                //self.petImage.setToCircle()
-//                self.imageCache.setObject(image!, forKey: pet.Photo as AnyObject)
-//                self.petImage.image = image
-//            }
+            let imageRef = Storage.storage().reference().child(pet.Photo)
+            imageRef.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+                guard let data = data else {
+                    return
+                }
+                let image = UIImage(data: data)
+                //self.petImage.setToCircle()
+                self.imageCache.setObject(image!, forKey: pet.Photo as AnyObject)
+                self.petImage.image = image
+            }
         }
         
         lblKind.text = pet.Kind

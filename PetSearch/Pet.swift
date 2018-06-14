@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Pet: Hashable {
+struct Pet {
     static let TableName = "Pet"
     var PetId: String
     var Uid: String

@@ -81,10 +81,24 @@ class MapVC: UIViewController, GMSMapViewDelegate {
             }
         } else if mapMode == .filterLocation {
             mapView.clear()
-            let marker = GMSMarker(position: coordinate)
+            let circleCenter = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            var rad : Double = 0.0
+            if UserDefaults.standard.object(forKey: "radius") != nil {
+                    rad = UserDefaults.standard.double(forKey: "radius")
+            } else {
+                rad = Double(RADIUS);
+            }
+            let circ = GMSCircle(position: circleCenter, radius: rad*1000)
+            
+            circ.fillColor = UIColor(red: 0, green: 0, blue: 255, alpha: 0.3)
+            circ.strokeColor = .red
+            circ.strokeWidth = 1
+            
+            //let marker = GMSMarker(position: coordinate)
             GMSGeocoder().reverseGeocodeCoordinate(coordinate) { (result, error) in
                 if let address = result?.firstResult() {
-                    marker.map = mapView
+                    //marker.map = mapView
+                    circ.map = mapView
                     confirmMessage(in: self, message: "Would you like to use this coordinate?", confirmText: "OK", confirmMethod: { (action) in
                         let delegateController = self.delegateController as! FilterVC
                         delegateController.latitude = coordinate.latitude

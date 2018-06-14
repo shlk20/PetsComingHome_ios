@@ -26,6 +26,9 @@ class RegisterVC: UIViewController {
         return controller
     }
     
+    @IBAction func didTapSignInButton(_ sender: Any) {
+        self.navigationController?.popViewController(animated: true)
+    }
     @IBAction func didRegister(_ sender: UIButton) {
         if let email = txtEmail.text, let password = txtPassword.text, let confirmPassword = txtConfirmPassword.text, let name = txtName.text, let phone = txtPhoneNumber.text {
             if password == confirmPassword {

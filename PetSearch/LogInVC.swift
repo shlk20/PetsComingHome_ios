@@ -16,8 +16,11 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
     
     @IBOutlet weak var txtEmail: UITextField!
     @IBOutlet weak var txtPassword: UITextField!
-    var btnGoogleSignIn: GIDSignInButton!
+    @IBOutlet weak var btnSignIn: UIButton!
     
+    @IBAction func didTapGoogleSignIn(_ sender: Any) {
+        GIDSignIn.sharedInstance().signIn()
+    }
     static func fromStoryboard(_ storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)) -> LogInVC {
         let controller = storyboard.instantiateViewController(withIdentifier: "LogInVC") as! LogInVC
         return controller
@@ -60,14 +63,7 @@ class LogInVC: UIViewController, GIDSignInUIDelegate {
         super.viewDidLoad()
         
         GIDSignIn.sharedInstance().uiDelegate = self
-        
-        // put google signin button to the view
-        btnGoogleSignIn = GIDSignInButton()
-        btnGoogleSignIn.style = .standard
-        btnGoogleSignIn.colorScheme = .dark
-        btnGoogleSignIn.center.x = view.center.x
-        btnGoogleSignIn.center.y = view.center.y + 80
-        view.addSubview(btnGoogleSignIn)
+    
         
         NotificationCenter.default.addObserver(self, selector: #selector(LogInVC.receiveToggleAuthUINotification(_:)), name: NSNotification.Name(rawValue: "ToggleAuthUINotification"), object: nil)
     }

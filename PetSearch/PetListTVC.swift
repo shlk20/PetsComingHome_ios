@@ -31,6 +31,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     var currentLatitude: Double = 0.0
     var currentLongitude: Double = 0.0
     
+    var isFiltered = false
     var ownPetsList = false {
         didSet {
             if ownPetsList, let uid = UserDefaults.standard.string(forKey: "UserId") {
@@ -58,21 +59,24 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     private var sideMenuStatus = false { // false means the side menu is hidden
         didSet {
             if sideMenuStatus {
-                self.view.addGestureRecognizer(sideMenuSwipeGestureRecogniser)
-                UIView.animate(withDuration: 0.5) {
-                    //self.sideMenuConstraint.constant += 100
-                    self.sideMenu.center.x += self.sideMenu.bounds.width
+                print("Open the side menu. \(self.sideMenu.center.x)")
+                if self.sideMenu.center.x == -100.0 {
+                    self.view.addGestureRecognizer(sideMenuSwipeGestureRecogniser)
+                    UIView.animate(withDuration: 0.5) {
+                        //self.sideMenuConstraint.constant += 100
+                        self.sideMenu.center.x += self.sideMenu.bounds.width
+                    }
+                    //self.navigationController?.navigationBar.layer.isHidden = true
                 }
-                //print(self.sideMenu.center.x)
-                self.navigationController?.navigationBar.layer.isHidden = true
             } else {
-                self.view.removeGestureRecognizer(sideMenuSwipeGestureRecogniser)
-                UIView.animate(withDuration: 0.5) {
-                    self.sideMenu.center.x -= self.sideMenu.bounds.width
+                print("Close the side menu. \(self.sideMenu.center.x)")
+                if self.sideMenu.center.x == 100.0 {
+                    self.view.removeGestureRecognizer(sideMenuSwipeGestureRecogniser)
+                    UIView.animate(withDuration: 0.5) {
+                        self.sideMenu.center.x -= self.sideMenu.bounds.width
+                    }
+                    //self.navigationController?.navigationBar.layer.isHidden = false
                 }
-                self.navigationController?.navigationBar.layer.zPosition = 0
-                self.navigationController?.navigationBar.layer.isHidden = false
-                //print(self.sideMenu.center.x)
             }
         }
     }
@@ -96,11 +100,11 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         stopObserving()
         
         if restrictByLatMax != 0.0, restrictByLonMax != 0.0, !ownPetsList {
-            var petsFIlter: [Pet] = []
-            var documentsFilter: [DocumentSnapshot] = []
             // do range filter
             let queryFilter = query.whereField("Longitude", isLessThanOrEqualTo: restrictByLonMax).whereField("Longitude", isGreaterThanOrEqualTo: restrictByLonMin)
             listener = queryFilter.addSnapshotListener { (snapshot, error) in
+                var petsFIlter: [Pet] = []
+                var documentsFilter: [DocumentSnapshot] = []
                 guard let snapshot = snapshot else {
                     return
                 }
@@ -122,7 +126,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             }
             
         } else {
-            print("without coordinates filter")
             listener = query.addSnapshotListener { [unowned self] (snapshot, error) in
                 guard let snapshot = snapshot else {
                     print("Cannot fetch results: \(error!)")
@@ -133,7 +136,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
                     if let model = Pet(dictionary: document.data()) {
                         return model
                     } else {
-                        print("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
                         fatalError("Unable to initialize type \(Pet.self) with dictionary \(document.data())")
                     }
                 }
@@ -263,9 +265,9 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         }
         
         if !ownPetsList {
-            print("back to home")
-            print("Radius: \(UserDefaults.standard.double(forKey: "radius"))")
-            pushCoordinates(lat: currentLatitude, lon: currentLongitude)
+            if !isFiltered {
+                pushCoordinates(lat: currentLatitude, lon: currentLongitude)
+            }
             var baseQuery = self.baseQuery()
             if (UserDefaults.standard.object(forKey: "showLostPetsAllowed") != nil)
             {
@@ -313,7 +315,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(indexPath)
         if !sideMenuStatus {
             let controller = SinglePetVC.fromStoryboard()
             controller.pet = pets[indexPath.row]
@@ -355,6 +356,7 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         //observeQuery()
         filterStatusView.isHidden = true
         filterBarHeight.constant = 0
+        isFiltered = false
     }
     
     // It use for receiving data from the filter view controller
@@ -362,7 +364,6 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
         guard let filterVC = sender.source as? FilterVC else { return }
         
         var filtered = baseQuery()
-        var isFiltered = false
         
         if let name = filterVC.txtName.text, !name.isEmpty {
             filtered = filtered.whereField("Name", isEqualTo: name)
@@ -447,29 +448,11 @@ class PetListTVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, UI
             radius = Double(RADIUS)
         }
         
-        //Earth radius in kms
-        //let R:Double = 6371
+        restrictByLatMin = lat - (radius / 111)
+        restrictByLatMax = lat + (radius / 111)
         
-        /*https://www.movable-type.co.uk/scripts/latlong.html
-         Getting max and min coordinates with given position and using bearing:
-         0 for restrictByLatMax
-         pi for restrictByLatMin
-         pi/2 for restrictByLonMax
-         3*pi/2 for restrictByLonMin
-         */
-        //restrictByLatMax = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(0))
-        //restrictByLatMin = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi))
-        restrictByLatMin = lat - (radius / 69)
-        restrictByLatMax = lat + (radius / 69)
-        
-//        var lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(Double.pi/2));
-//        print("Lat 2 \(lat2)")
-//        restrictByLonMax = lon + atan2(sin(Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
-        restrictByLonMin = lon - radius / fabs(cos(deg2rad(rad: lat))*69)
-        restrictByLonMax = lon + radius / fabs(cos(deg2rad(rad: lat))*69)
-        
-//        lat2 = asin(sin(deg2rad(rad: lat))*cos(radius/R) + cos(deg2rad(rad: lat))*sin(radius/R)*cos(3*Double.pi/2));
-//        restrictByLonMin = lon + atan2(sin(3*Double.pi/2)*sin(radius/R)*cos(lat),cos(radius/R)-sin(lat)*sin(lat2));
+        restrictByLonMin = lon - radius / fabs(cos(deg2rad(rad: lat)) * 111)
+        restrictByLonMax = lon + radius / fabs(cos(deg2rad(rad: lat)) * 111)
         
     }
 }

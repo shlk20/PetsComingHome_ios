@@ -33,7 +33,6 @@
 		B6633C0B20C245B200568009 /* GoogleMapInfoWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = B6633C0A20C245B200568009 /* GoogleMapInfoWindow.xib */; };
 		B6633C0D20C24A0200568009 /* GoogleMapInfoWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */; };
 		B6BD8B8520A7D44E00AEE7A3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */; };
-		B6C3386A20C0127F008A850B /* CommentsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C3386920C0127F008A850B /* CommentsVC.swift */; };
 		B6FDE9C420CE291700439E9E /* StylesB.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C220CE291700439E9E /* StylesB.swift */; };
 		B6FDE9C520CE291700439E9E /* StylesNC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C320CE291700439E9E /* StylesNC.swift */; };
 		B6FDE9C720CE292300439E9E /* SettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6FDE9C620CE292300439E9E /* SettingsVC.swift */; };
@@ -97,7 +96,6 @@
 		B6633C0A20C245B200568009 /* GoogleMapInfoWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GoogleMapInfoWindow.xib; sourceTree = "<group>"; };
 		B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleMapInfoWindow.swift; sourceTree = "<group>"; };
 		B6BD8B8420A7D44E00AEE7A3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		B6C3386920C0127F008A850B /* CommentsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsVC.swift; sourceTree = "<group>"; };
 		B6FDE9C220CE291700439E9E /* StylesB.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StylesB.swift; sourceTree = "<group>"; };
 		B6FDE9C320CE291700439E9E /* StylesNC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StylesNC.swift; sourceTree = "<group>"; };
 		B6FDE9C620CE292300439E9E /* SettingsVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsVC.swift; sourceTree = "<group>"; };
@@ -233,7 +231,6 @@
 				90AAD60320A2C9610086556F /* AddPetVC.swift */,
 				90AAD60520A2C9720086556F /* MapVC.swift */,
 				90AAD60720A2C9930086556F /* PetListTVC.swift */,
-				B6C3386920C0127F008A850B /* CommentsVC.swift */,
 				B6633C0C20C24A0200568009 /* GoogleMapInfoWindow.swift */,
 			);
 			name = Controller;
@@ -539,7 +536,6 @@
 				90AAD5FE20A2C8F10086556F /* RegisterVC.swift in Sources */,
 				B65FA87820BF68290071D9CC /* User.swift in Sources */,
 				B6FDE9C720CE292300439E9E /* SettingsVC.swift in Sources */,
-				B6C3386A20C0127F008A850B /* CommentsVC.swift in Sources */,
 				B65FA87620BF66F00071D9CC /* LocalCollection.swift in Sources */,
 				90AAD60620A2C9720086556F /* MapVC.swift in Sources */,
 				90AAD5C420A2C7A50086556F /* AppDelegate.swift in Sources */,
